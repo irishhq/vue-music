@@ -8,6 +8,7 @@
 </template>
 <script>
 // import BetterScroll from 'better-scroll'
+import { addClass } from 'common/js/dom'
 export default {
   name: 'slider',
   props: {
@@ -30,9 +31,18 @@ export default {
   },
   methods: {
     _setSliderWidth() {
-      let sliderGroup = this.$refs.sliderGroup
+      let children = this.$refs.sliderGroup.children
       let sliderWidth = this.$refs.slider.clientWidth
-      console.log(sliderGroup, sliderWidth)
+      // let width = 0;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i]
+        console.log('=========')
+        addClass(child, 'slider-item')
+        child.style.width = sliderWidth
+        // width += sliderWidth
+      }
+      // this.$refs.sliderGroup.style.width = width + 'px'
+      // console.log(this.$refs.sliderGroup.style.width)
     },
     _initSlider() {}
   }
