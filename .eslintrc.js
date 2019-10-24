@@ -27,6 +27,9 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     // 文件末尾强制换行  
     "eol-last": 0, 
-    "space-before-function-paren": [2, "always"],
+    "space-before-function-paren": [0, "always"],
+    "indent": ["error", 2],
+    'semi': 0,
+    // 'no-unused-vars': 0 /* 关闭定义变量未使用提示/报错 */
   }
 }
