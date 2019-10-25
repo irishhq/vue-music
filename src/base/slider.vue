@@ -3,18 +3,29 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div class="dots"></div>
+    <div class="dots">
+      <span class="dot" v-for="(item, index) in dots" :key="index" :class="{ active: currentPageIndex === index }"></span>
+    </div>
   </div>
 </template>
 <script>
-// import BetterScroll from 'better-scroll'
+import BScroll from 'better-scroll'/* better-scroll v1 */
 import { addClass } from 'common/js/dom'
 export default {
   name: 'slider',
+  data() {
+    return {
+      dots: {
+        type: Array,
+        default: []
+      },
+      currentPageIndex: 0
+    }
+  },
   props: {
     loop: {
       type: Boolean,
-      default: false
+      default: true
     },
     interval: {
       type: Number,
@@ -22,29 +33,74 @@ export default {
     },
     autoplay: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   mounted() {
     this._setSliderWidth()
+    this._initDots()
     this._initSlider()
+    if (this.autoplay) {
+        this._play()
+    }
   },
   methods: {
     _setSliderWidth() {
       let children = this.$refs.sliderGroup.children
       let sliderWidth = this.$refs.slider.clientWidth
-      // let width = 0;
+      let width = 0; /* total width */
       for (let i = 0; i < children.length; i++) {
         const child = children[i]
-        console.log('=========')
         addClass(child, 'slider-item')
-        child.style.width = sliderWidth
-        // width += sliderWidth
+        child.style.width = sliderWidth + 'px'
+        width += sliderWidth
       }
-      // this.$refs.sliderGroup.style.width = width + 'px'
-      // console.log(this.$refs.sliderGroup.style.width)
+      if (this.loop) {
+        width += 2 * sliderWidth
+      }
+      this.$refs.sliderGroup.style.width = width + 'px'
     },
-    _initSlider() {}
+    _initSlider() {
+      this.slider = new BScroll(this.$refs.slider, {
+        scrollX: true,
+        scrollY: false,
+        momentum: false,
+        snap: {  
+          loop: this.loop, // 循环  
+          threshold: 0.3,  
+          speed: 400 // 轮播间隔  
+        },  
+      })
+      console.log('scrollEnd start', this.slider.getCurrentPage().pageX)
+      /* 基础参数 https://github.com/ustbhuangyi/better-scroll/tree/v1/doc/zh-hans */
+      /* slide参数 https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/slide/slide.vue */
+      this.slider.on('scrollEnd', () => {
+        let pageIndex = this.slider.getCurrentPage().pageX/* 返回值：{Object} { x: posX, y: posY,pageX: x, pageY: y} */
+        console.log('scrollEnd start', pageIndex)
+        if (this.loop) {
+          pageIndex -= 1
+        }
+        this.currentPageIndex = pageIndex
+
+        if (this.autoPlay) {
+          this._play()
+        }
+      })
+    },
+    _initDots() {
+      this.dots = new Array(this.$refs.sliderGroup.children.length)
+    },
+    _play() {
+      console.log('this._play()')
+      let pageIndex = this.currentPageIndex + 1
+      if (this.loop) {
+        console.log('this.loop')
+        pageIndex += 1
+      }
+      setTimeout(() => {
+        this.slider.goToPage(pageIndex % this.$refs.sliderGroup.children.length, 0, 400)
+      }, this.interval)
+    }
   }
 }
 </script>
