@@ -4,7 +4,7 @@
       <slot></slot>
     </div>
     <div class="dots">
-      <span class="dot" v-for="(item, index) in dots" :key="index" :class="{ active: currentPageIndex === index }"></span>
+      <span class="dot" v-for="(item, index) in dots" :id="index" :key="index" :class="{ active: currentPageIndex === index }"></span>
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default {
       type: Number,
       default: 3000
     },
-    autoplay: {
+    autoPlay: {
       type: Boolean,
       default: true
     }
@@ -40,12 +40,21 @@ export default {
     this._setSliderWidth()
     this._initDots() /* 调用在初始化slider前 */
     this._initSlider()
-    /* if (this.autoplay) {
+    if (this.autoPlay) {
       this._play()
-    } */
+    }
+
+    window.addEventListener('resize', () => { /* 监听视图事件resize,DOM事件https://developer.mozilla.org/zh-CN/docs/Web/Events */
+      console.log('resize')
+      if (!this.slider) {
+        return
+      }
+      this._setSliderWidth(true)
+      this.slider.refresh()
+    })
   },
   methods: {
-    _setSliderWidth() {
+    _setSliderWidth(isRize = false) {
       let children = this.$refs.sliderGroup.children
       let sliderWidth = this.$refs.slider.clientWidth
       let width = 0; /* total width */
@@ -56,7 +65,7 @@ export default {
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
-      if (this.loop) {
+      if (this.loop && !isRize) {
         width += 2 * sliderWidth /* 实现无缝轮播 */
       }
       this.$refs.sliderGroup.style.width = width + 'px'
@@ -70,32 +79,30 @@ export default {
           loop: this.loop, // 循环
           threshold: 0.3,
           speed: 400 // 轮播间隔
-        }
+        },
+        bounce: false
       })
       /* 基础参数 https://github.com/ustbhuangyi/better-scroll/tree/v1/doc/zh-hans */
-      /* slide参数 https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/slide/slide.vue */
+      /* slide参考 https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/slide/slide.vue */
       this.slider.on('scrollEnd', () => {
-        let pageIndex = this.slider.getCurrentPage().pageX + 1/* 返回值：{Object} { x: posX, y: posY,pageX: x, pageY: y} */
-        if (this.loop) {
-          pageIndex -= 1
-        }
+        let pageIndex = this.slider.getCurrentPage().pageX /* 返回值：{Object} { x: posX, y: posY,pageX: x, pageY: y} */
         this.currentPageIndex = pageIndex
 
-        /* if (this.autoPlay) {
+        if (this.autoPlay) {
           this._play()
-        } */
+        }
+      })
+      this.slider.on('scrollStart', () => {
+        clearTimeout(this.playTimer) /* 优化：禁止拖动slider时自动播放 */
       })
     },
     _initDots() {
       this.dots = new Array(this.$refs.sliderGroup.children.length)
     },
     _play() {
-      let pageIndex = this.currentPageIndex
-      if (this.loop) {
-        pageIndex += 1
-      }
-      setTimeout(() => {
-        this.slider.goToPage(pageIndex, 0, 400)
+      clearTimeout(this.playTimer)
+      this.playTimer = setTimeout(() => {
+        this.slider.next()
       }, this.interval)
     }
   }
