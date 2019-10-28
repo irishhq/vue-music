@@ -19,7 +19,7 @@ export default {
         type: Array,
         default: []
       },
-      currentPageIndex: 0
+      currentPageIndex: 0 /* 设置当前页dot效果 */
     }
   },
   props: {
@@ -38,11 +38,11 @@ export default {
   },
   mounted() {
     this._setSliderWidth()
-    this._initDots()
+    this._initDots() /* 调用在初始化slider前 */
     this._initSlider()
-    if (this.autoplay) {
-        this._play()
-    }
+    /* if (this.autoplay) {
+      this._play()
+    } */
   },
   methods: {
     _setSliderWidth() {
@@ -52,11 +52,12 @@ export default {
       for (let i = 0; i < children.length; i++) {
         const child = children[i]
         addClass(child, 'slider-item')
+
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
       if (this.loop) {
-        width += 2 * sliderWidth
+        width += 2 * sliderWidth /* 实现无缝轮播 */
       }
       this.$refs.sliderGroup.style.width = width + 'px'
     },
@@ -65,40 +66,36 @@ export default {
         scrollX: true,
         scrollY: false,
         momentum: false,
-        snap: {  
-          loop: this.loop, // 循环  
-          threshold: 0.3,  
-          speed: 400 // 轮播间隔  
-        },  
+        snap: {
+          loop: this.loop, // 循环
+          threshold: 0.3,
+          speed: 400 // 轮播间隔
+        }
       })
-      console.log('scrollEnd start', this.slider.getCurrentPage().pageX)
       /* 基础参数 https://github.com/ustbhuangyi/better-scroll/tree/v1/doc/zh-hans */
       /* slide参数 https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/slide/slide.vue */
       this.slider.on('scrollEnd', () => {
-        let pageIndex = this.slider.getCurrentPage().pageX/* 返回值：{Object} { x: posX, y: posY,pageX: x, pageY: y} */
-        console.log('scrollEnd start', pageIndex)
+        let pageIndex = this.slider.getCurrentPage().pageX + 1/* 返回值：{Object} { x: posX, y: posY,pageX: x, pageY: y} */
         if (this.loop) {
           pageIndex -= 1
         }
         this.currentPageIndex = pageIndex
 
-        if (this.autoPlay) {
+        /* if (this.autoPlay) {
           this._play()
-        }
+        } */
       })
     },
     _initDots() {
       this.dots = new Array(this.$refs.sliderGroup.children.length)
     },
     _play() {
-      console.log('this._play()')
-      let pageIndex = this.currentPageIndex + 1
+      let pageIndex = this.currentPageIndex
       if (this.loop) {
-        console.log('this.loop')
         pageIndex += 1
       }
       setTimeout(() => {
-        this.slider.goToPage(pageIndex % this.$refs.sliderGroup.children.length, 0, 400)
+        this.slider.goToPage(pageIndex, 0, 400)
       }, this.interval)
     }
   }
