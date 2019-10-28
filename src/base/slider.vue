@@ -53,6 +53,19 @@ export default {
       this.slider.refresh()
     })
   },
+  beforeDestroyed() {
+    clearTimeout(this.playTimer)
+  },
+  activated() { /* keep-alive组件激活时调用。 */
+    console.log('activated...')
+    if (this.autoPlay) {
+      this._play()
+    }
+  },
+  deactivated() {
+    console.log('deactivated...')
+    clearTimeout(this.playTimer)
+  },
   methods: {
     _setSliderWidth(isRize = false) {
       let children = this.$refs.sliderGroup.children
@@ -100,7 +113,7 @@ export default {
       this.dots = new Array(this.$refs.sliderGroup.children.length)
     },
     _play() {
-      clearTimeout(this.playTimer)
+      // clearTimeout(this.playTimer)
       this.playTimer = setTimeout(() => {
         this.slider.next()
       }, this.interval)
