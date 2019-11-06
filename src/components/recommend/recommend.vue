@@ -1,34 +1,60 @@
 <template>
   <div class="recommend">
-    <div class="recommend-content">
-      <div class="slider-wrapper">
-        <slider v-if="recommends.length">
-          <div v-for="item in recommends" :key="item.id">
-            <a :href="item.linkUrl">
-              <img :src="item.picUrl">
-            </a>
-          </div>
-        </slider>
+    <scroll class="recommend-content" :data="discList" ref="scroll">
+      <div>
+        <div class="slider-wrapper">
+          <slider v-if="recommends.length">
+            <div v-for="item in recommends" :key="item.id">
+              <a :href="item.linkUrl">
+                <img :src="item.picUrl" @load="loadImg">
+              </a>
+            </div>
+          </slider>
+        </div>
+        <div class="recommend-list">
+          <div class="list-title">热门歌单推荐</div>
+          <ul>
+            <li class="item" v-for="item in discList" :key="item.dissid">
+              <div class="icon">
+                <img width="60" height="60" :src="item.imgurl">
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </scroll>
   </div>
 </template>
 <script>
 import { getRecommend, getDiscList } from 'api/recommend'
 import { ERROR_OK } from 'api/config'
 import Slider from 'base/slider'
+import Scroll from 'base/scroll/scroll'
 export default {
   components: {
-    Slider
+    Slider,
+    Scroll
   },
   data() {
     return {
-      recommends: []
+      recommends: [],
+      discList: []
     };
   },
   created() {
     this._getRecommend()
     this._getDiscList()
+    /* 测试img不触发refresh时列表高度
+    setTimeout(() => {
+      this._getRecommend()
+    }, 8000);
+    setTimeout(() => {
+      this._getDiscList()
+    }, 2000); */
   },
   methods: {
     _getRecommend() {
@@ -41,10 +67,16 @@ export default {
     _getDiscList() {
       getDiscList().then((res) => {
         if (res.code === ERROR_OK) {
-          console.log('getDiscList。。。')
-          console.log(res)
+          this.discList = res.data.list
         }
       })
+    },
+    loadImg() {
+      if (!this.checkedLoad) {
+        /* tips: onload中refresh只触发一次 */
+        this.$refs.scroll.refresh()
+        this.checkedLoad = true
+      }
     }
   }
 };
