@@ -58,16 +58,16 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         axios
           .get(url, {
             headers: {
-              referer: 'https://y.qq.com/',
+              referer: 'https://c.y.qq.com/',
               host: 'c.y.qq.com'
             },
-            params: req.body
+            params: req.query
           })
           .then(response => {
-            res.json(response);
+            res.json(response.data);
           })
-          .catch(err => {
-            console.log(err);
+          .catch(e => {
+            console.log(e);
           });
       });
     }
