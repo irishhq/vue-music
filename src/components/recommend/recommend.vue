@@ -1,12 +1,12 @@
 <template>
   <div class="recommend">
-    <scroll class="recommend-content" :data="discList">
+    <scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
         <div class="slider-wrapper">
           <slider v-if="recommends.length">
             <div v-for="item in recommends" :key="item.id">
               <a :href="item.linkUrl">
-                <img :src="item.picUrl">
+                <img :src="item.picUrl" @load="loadImg">
               </a>
             </div>
           </slider>
@@ -48,6 +48,13 @@ export default {
   created() {
     this._getRecommend()
     this._getDiscList()
+    /* 测试img不触发refresh时列表高度
+    setTimeout(() => {
+      this._getRecommend()
+    }, 8000);
+    setTimeout(() => {
+      this._getDiscList()
+    }, 2000); */
   },
   methods: {
     _getRecommend() {
@@ -63,6 +70,13 @@ export default {
           this.discList = res.data.list
         }
       })
+    },
+    loadImg() {
+      if (!this.checkedLoad) {
+        /* tips: onload中refresh只触发一次 */
+        this.$refs.scroll.refresh()
+        this.checkedLoad = true
+      }
     }
   }
 };
