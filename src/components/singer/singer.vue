@@ -8,6 +8,8 @@ import { getSingerList } from 'api/singer'
 import { ERROR_OK } from 'api/config'
 import Listview from 'base/listview/listview'
 import Singer from 'common/js/singer'
+const HOT_TITLE = '热门'
+const HOT_LEN = 10
 export default {
   data() {
     return {
@@ -36,12 +38,12 @@ export default {
     normalizeSingers(list) {
       let map = {
         hot: {
-          title: '热门',
+          title: HOT_TITLE,
           items: []
         }
       }
       list.forEach((item, index) => {
-        if (index < 10) {
+        if (index < HOT_LEN) {
           map.hot.items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
         }
         let key = item.Findex
@@ -54,6 +56,20 @@ export default {
         map[key].items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
       })
       console.log(typeof (map), map)
+      /* 数据排序,展示有序列表 */
+
+      let hot = [] /* 热门 */
+      let letter = [] /* 字母 */
+      let other = [] /* 其他字符 */
+      for (let val of map) {
+        /* if (val.title.match(/[A-Za-z]/)) {
+          letter.push(val)
+        } else if (val.title === HOT_TITLE) {
+          hot.push(val)
+        } else {
+          other.push(val)
+        } */
+      }
       return map
     }
   }
