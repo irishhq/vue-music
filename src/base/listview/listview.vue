@@ -11,6 +11,11 @@
         </ul>
       </li>
     </ul>
+    <div @touchstart.stop.prevent="onShortCutTouchStart">
+      <ul class="list-shortcut">
+        <li class="item" v-for="(item, index) in shortcutList" :key="index">{{item}}</li>
+      </ul>
+    </div>
   </scroll>
 </template>
 <script>
@@ -19,12 +24,24 @@ export default {
   components: {
     Scroll
   },
+  computed: {
+    shortcutList() {
+      return this.data.map((group) => {
+        return group.title.substr(0, 1)
+      })
+    }
+  },
   props: {
     data: {
-      type: Object,
+      type: Array,
       default: () => {
-        return {}
+        return []
       }
+    }
+  },
+  methods: {
+    onShortCutTouchStart(e) {
+      console.log('onShortCutTouchStart...', e)
     }
   }
 }
