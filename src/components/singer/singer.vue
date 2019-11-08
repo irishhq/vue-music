@@ -36,6 +36,10 @@ export default {
         hot: {
           title: HOT_TITLE,
           items: []
+        },
+        other: {
+          title: '#',
+          items: []
         }
       }
       list.forEach((item, index) => {
@@ -43,13 +47,17 @@ export default {
           map.hot.items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
         }
         let key = item.Findex
-        if (!map[key]) {
-          map[key] = {
-            title: key,
-            items: []
+        if (key.match(/[a-zA-Z]/)) {
+          if (!map[key]) {
+            map[key] = {
+              title: key,
+              items: []
+            }
           }
+          map[key].items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
+        } else {
+          map.other.items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
         }
-        map[key].items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
       })
       /* 数据排序,展示有序列表 */
       let hot = [] /* 热门 */
