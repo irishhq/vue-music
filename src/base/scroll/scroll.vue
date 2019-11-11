@@ -40,7 +40,10 @@ export default {
       }
       let options = {
         probeType: this.probeType,
-        click: this.click
+        click: this.click,
+        mouseWheel: true,
+        disableMouse: false,
+        disableTouch: false
       }
       this.scroll = new BScroll(this.$refs['scroll-wrapper'], options)
     },

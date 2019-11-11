@@ -33,6 +33,10 @@ export default {
       })
     }
   },
+  created() {
+    this.listenScroll = true
+    this.touch = {}
+  },
   props: {
     data: {
       type: Array,
@@ -51,16 +55,15 @@ export default {
     },
     onShortCutTouchMove(el) {
       let moveTouch = el.touches[0]
-      this.touch.y2 = moveTouch.pageY
-      let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT || 0
-      debugger
-      let anchorIndex = this.touch.anchorIndex + delta
+      let delta = parseInt(moveTouch.pageY - this.touch.y1) / ANCHOR_HEIGHT | 0
+      /**
+       * 位运算符‘|0’: js内部的类型自动转换，js数值都是由64位浮点型表示的，当进行位运算的时候，会自动转换为32为有符号的整数，并舍弃小数位。所以就可以实现向下取整
+       * typeof (this.touch.anchorIndex): string
+       * typeof (delta): number
+       */
+      let anchorIndex = parseInt(this.touch.anchorIndex) + delta /* 修复字母索引不能正确滚动 */
       this.$refs.listview.scrollToElement(this.$refs.listgroup[anchorIndex])
     }
-  },
-  created() {
-    this.listenScroll = true
-    this.touch = {}
   }
 }
 </script>
