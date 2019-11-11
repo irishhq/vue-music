@@ -24,7 +24,9 @@ export default {
   },
 
   mounted() {
-    this.initScroll()
+    setTimeout(() => {
+      this.initScroll()
+    }, 20)
   },
   watch: {
     data(val) {
@@ -45,6 +47,12 @@ export default {
     /* https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/scroll/scroll.vue */
     refresh() {
       this.scroll && this.scroll.refresh()
+    },
+    scrollTo() {
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+    },
+    scrollToElement() {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     }
   }
 }

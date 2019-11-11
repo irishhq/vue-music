@@ -14,3 +14,12 @@ export function hasClass(el, className) {
   return reg.test(el.className) */
   return el.className.split(' ').indexOf(className)
 }
+
+export function getDataAttr(el, attr, value) {
+  const prefix = 'data-'
+  if (value) {
+    return el.target.setAttribute(prefix + attr, value);
+  } else {
+    return el.target.getAttribute(prefix + attr);
+  }
+}
