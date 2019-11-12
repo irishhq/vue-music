@@ -20,6 +20,10 @@ export default {
       default: function () {
         return []
       }
+    },
+    listenScroll: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -46,6 +50,12 @@ export default {
         disableTouch: false
       }
       this.scroll = new BScroll(this.$refs['scroll-wrapper'], options)
+
+      if (this.listenScroll) {
+        this.scroll.on('scroll', pos => {
+          this.$emit('scroll', pos)
+        })
+      }
     },
     /* https://github.com/ustbhuangyi/better-scroll/blob/v1/example/components/scroll/scroll.vue */
     refresh() {
