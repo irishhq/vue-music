@@ -16,21 +16,31 @@
         <li class="item" v-for="(item, index) in shortcutList" :key="index" :data-index="index" :class="{'current': currentIndex === index}">{{item}}</li>
       </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle.length" ref="listFixed">
+      <h2 class="fixed-title">{{fixedTitle}}</h2>
+    </div>
+    <div class="loading-container" v-show="!data.length">
+      <loading></loading>
+    </div>
   </scroll>
 </template>
 <script>
 import Scroll from 'base/scroll/scroll'
 import { getDataAttr } from 'common/js/dom'
+import Loading from 'base/loading/loading'
 const ANCHOR_HEIGHT = 18
+const TITLE_HEIGHT = 30
 export default {
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   data() {
     return {
       listenScroll: false,
       scrollY: -1,
-      currentIndex: 0
+      currentIndex: 0,
+      diff: 0 /* 当前上限与滚动位置的差值 */
     }
   },
   computed: {
@@ -38,6 +48,12 @@ export default {
       return this.data.map((group) => {
         return group.title.substr(0, 1)
       })
+    },
+    fixedTitle() {
+      if (this.scrollY > 0) {
+        return ''
+      }
+      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
     }
   },
   created() {
@@ -110,11 +126,21 @@ export default {
         const heightUp = listHeight[i + 1]
         if (-newY < heightUp && -newY >= heightLow) {
           this.currentIndex = i
+          this.diff = heightUp + newY
           return
         }
       }
       /* 当滚动到底部，且-newY大于最后一个元素的上限 */
       this.currentIndex = listHeight.length - 2
+    },
+    diff(newVal) {
+      let translateY = (newVal > 0 && newVal - TITLE_HEIGHT < 0) ? newVal - TITLE_HEIGHT : 0
+      if (this.translateY === translateY) { /* 为0时，减少重复渲染 */
+        return
+      }
+      console.log(translateY)
+      this.translateY = translateY
+      this.$refs.listFixed.style.transform = `translate3d(0, ${translateY}px, 0)`
     }
   }
 }
