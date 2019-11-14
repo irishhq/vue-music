@@ -4,7 +4,7 @@
       <li class="list-group" v-for="group in data" :key='group.title' ref="listgroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item" v-for="item in group.items" :key="item.id">
+          <li @click="selectItem(item)" class="list-group-item" v-for="item in group.items" :key="item.id">
             <img class="avatar" v-lazy="item.avator">
             <span class="name">{{item.name}}</span>
           </li>
@@ -71,6 +71,10 @@ export default {
     }
   },
   methods: {
+    selectItem(item) {
+      console.log(item)
+      this.$emit('select', item)
+    },
     onShortCutTouchStart(e) {
       let anchorIndex = getDataAttr(e, 'index')
       let firstTouch = e.touches[0]
