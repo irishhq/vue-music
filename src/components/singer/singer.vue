@@ -1,6 +1,7 @@
 <template>
   <div id="singerPage" class="singer">
-    <Listview v-bind:data="singers" @select="selectSinger"></Listview>
+    <Listview v-bind:data="singers" @select="selectSinger" v-show="this.$route.path==='/singer'"></Listview>
+    <router-view></router-view> 
   </div>
 </template>
 <script>

@@ -2,9 +2,9 @@
   <div id="app">
     <m-header></m-header>
     <tab></tab>
-    <keep-alive> <!-- 保留组件状态/避免重新渲染。 -->
+    <!-- <keep-alive> 保留组件状态/避免重新渲染。 -->
       <router-view></router-view>
-    </keep-alive>
+    <!-- </keep-alive> -->
     <!--  update  -->
   </div>
 </template>
@@ -17,6 +17,13 @@ export default {
   components: {
     MHeader,
     Tab
+  },
+  watch: {
+  //   $route(to, from) {
+  //     debugger
+  //     // console('to', to);
+  //     // console('from', from);
+  //   }
   }
 }
 </script>
