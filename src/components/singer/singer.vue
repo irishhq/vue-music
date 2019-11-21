@@ -1,6 +1,7 @@
 <template>
   <div id="singerPage" class="singer">
-    <Listview v-bind:data="singers"></Listview>
+    <Listview v-bind:data="singers" @select="selectSinger" v-show="this.$route.path==='/singer'"></Listview>
+    <router-view></router-view> 
   </div>
 </template>
 <script>
@@ -23,6 +24,12 @@ export default {
     this._getSingerList()
   },
   methods: {
+    selectSinger(singer) {
+      console.log(singer.id)
+      this.$router.push({
+        path: `/singer/${singer.id}`
+      })
+    },
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERROR_OK) {
