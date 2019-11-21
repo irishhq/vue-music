@@ -2,6 +2,7 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store/index'
 import 'common/stylus/index.styl'
 import fastclick from 'fastclick'
 import Lazyload from 'vue-lazyload'
@@ -21,5 +22,6 @@ Vue.use(Lazyload, {
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 })

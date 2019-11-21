@@ -1,7 +1,7 @@
 <template>
   <div id="singerPage" class="singer">
     <Listview v-bind:data="singers" @select="selectSinger" v-show="this.$route.path==='/singer'"></Listview>
-    <router-view></router-view> 
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -9,6 +9,7 @@ import { getSingerList } from 'api/singer'
 import { ERROR_OK } from 'api/config'
 import Listview from 'base/listview/listview'
 import Singer from 'common/js/singer'
+import { mapMutations } from 'vuex'
 const HOT_TITLE = '热门'
 const HOT_LEN = 10
 export default {
@@ -25,16 +26,15 @@ export default {
   },
   methods: {
     selectSinger(singer) {
-      console.log(singer.id)
       this.$router.push({
         path: `/singer/${singer.id}`
       })
+      this.setSinger(singer)
     },
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERROR_OK) {
           this.singers = this.normalizeSingers(res.data.list || [])
-          console.log(Object.prototype.toString.call(this.singers) === '[object Array]')
         }
       })
     },
@@ -86,7 +86,10 @@ export default {
       letter.unshift.apply(letter, hot) /* concat内存开销大;大数组合并小数组，减少数组元素操作次数 */
       letter.push.apply(letter, other)
       return letter
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   }
 }
 </script>

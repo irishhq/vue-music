@@ -7,7 +7,26 @@
 </template>
 
 <script>
-export default {}
+import { mapGetters } from 'vuex'
+import { getSingerDetail } from 'api/singer'
+import { ERROR_OK } from 'api/config'
+export default {
+  computed: {
+    ...mapGetters([
+      'singer'
+    ])
+  },
+  created() {
+    this._getDetail()
+  },
+  methods: {
+    _getDetail() {
+      getSingerDetail(this.singer.id).then(res => {
+        console.log(res)
+      })
+    }
+  }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

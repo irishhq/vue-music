@@ -72,7 +72,6 @@ export default {
   },
   methods: {
     selectItem(item) {
-      console.log(item)
       this.$emit('select', item)
     },
     onShortCutTouchStart(e) {
@@ -142,7 +141,6 @@ export default {
       if (this.translateY === translateY) { /* 为0时，减少重复渲染 */
         return
       }
-      console.log(translateY)
       this.translateY = translateY
       this.$refs.listFixed.style.transform = `translate3d(0, ${translateY}px, 0)`
     }
