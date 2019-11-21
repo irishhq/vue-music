@@ -51,7 +51,7 @@ export default {
       }
       list.forEach((item, index) => {
         if (index < HOT_LEN) {
-          map.hot.items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
+          map.hot.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
         }
         let key = item.Findex
         if (key.match(/[a-zA-Z]/)) {
@@ -61,9 +61,9 @@ export default {
               items: []
             }
           }
-          map[key].items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
+          map[key].items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
         } else {
-          map.other.items.push(new Singer(item.Fsinger_id, item.Fsinger_name, item.Fsinger_mid))
+          map.other.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
         }
       })
       /* 数据排序,展示有序列表 */
