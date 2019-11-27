@@ -87,8 +87,9 @@ export default {
       letter.push.apply(letter, other)
       return letter
     },
+    /* 工具函数会将store中的state映射到局部计算属性中 */
     ...mapMutations({
-      setSinger: 'SET_SINGER'
+      setSinger: 'SET_SINGER' // 传字符串参数 'SET_SINGER' 等同于 `state => state.SET_SINGER`
     })
   }
 }
