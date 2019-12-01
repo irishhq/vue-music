@@ -110,7 +110,20 @@ module.exports = new Promise((resolve, reject) => {
       // Add FriendlyErrorsPlugin
       devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
         compilationSuccessInfo: {
-          messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
+          messages: [`
+ ______            __                  __    __                                         
+/      |          /  |                /  |  /  |                                        
+$$$$$$/   ______  $$/   _______       $$ |  $$ | __    __   ______   _______    ______  
+  $$ |   /      \ /  | /       |      $$ |__$$ |/  |  /  | /      \ /       \  /      \ 
+  $$ |  /$$$$$$  |$$ |/$$$$$$$/       $$    $$ |$$ |  $$ | $$$$$$  |$$$$$$$  |/$$$$$$  |
+  $$ |  $$ |  $$/ $$ |$$      \       $$$$$$$$ |$$ |  $$ | /    $$ |$$ |  $$ |$$ |  $$ |
+ _$$ |_ $$ |      $$ | $$$$$$  |      $$ |  $$ |$$ \__$$ |/$$$$$$$ |$$ |  $$ |$$ \__$$ |
+/ $$   |$$ |      $$ |/     $$/       $$ |  $$ |$$    $$/ $$    $$ |$$ |  $$ |$$    $$ |
+$$$$$$/ $$/       $$/ $$$$$$$/        $$/   $$/  $$$$$$/   $$$$$$$/ $$/   $$/  $$$$$$$ |
+                                                                              /  \__$$ |
+                                                                              $$    $$/ 
+                                                                               $$$$$$/  
+          Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
         },
         onErrors: config.dev.notifyOnErrors
         ? utils.createNotifierCallback()

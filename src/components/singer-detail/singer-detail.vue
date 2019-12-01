@@ -10,6 +10,8 @@
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
 import { ERROR_OK } from 'api/config'
+import { createSong } from 'common/js/song'
+import { getSongVkey } from 'api/song'
 export default {
   computed: {
     ...mapGetters([
