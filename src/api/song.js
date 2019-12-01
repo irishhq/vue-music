@@ -1,13 +1,14 @@
+import jsonp from 'common/js/jsonp';
 // 获取歌曲的vkey
 export function getSongVkey(songmid) {
-  const url = "https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg";
+  const url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg';
   const data = Object.assign(
     {},
     {
-      callback: "musicJsonCallback",
+      callback: 'musicJsonCallback',
       loginUin: 3051522991,
-      format: "jsonp",
-      platform: "yqq",
+      format: 'jsonp',
+      platform: 'yqq',
       needNewCode: 0,
       cid: 205361747,
       uin: 3051522991,

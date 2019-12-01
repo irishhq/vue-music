@@ -25,7 +25,28 @@ export default {
     _getDetail() {
       getSingerDetail(this.singer.id).then(res => {
         console.log(res)
+        this._formatSongs(res.data.list)
       })
+    },
+    _formatSongs(list) {
+      let result = []
+      list.forEach((item) => {
+        // console.log('item',item)
+        // 解构赋值-拿到item 下的 musicData 列表数据
+        let {musicData} = item
+        // 更新-加上vkey
+        getSongVkey(musicData.songmid).then(res => {
+          const vkey = res.data.items[0].vkey;
+          if (musicData.songid && musicData.albummid) {
+            result.push(createSong(musicData, vkey))
+          }
+        })
+        console.log('musicData', musicData)
+        // if(musicData.songid && musicData.albummid){
+        //   result.push(CreatSong(musicData))
+        // }
+      })
+      return result
     }
   }
 }
