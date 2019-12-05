@@ -37,6 +37,9 @@ export default {
   },
   methods: {
     _getDetail() {
+      if (!this.singer.id) {
+        this.$router.push('/singer')
+      }
       getSingerDetail(this.singer.id).then(res => {
         console.log(this.singer)
         this.songs = this._formatSongs(res.data.list)
@@ -45,7 +48,6 @@ export default {
     _formatSongs(list) {
       let result = []
       list.forEach((item) => {
-        // console.log('item',item)
         // 解构赋值-拿到item 下的 musicData 列表数据
         let {musicData} = item
         // 更新-加上vkey
@@ -56,9 +58,6 @@ export default {
           }
         })
         console.log('musicData', musicData)
-        // if(musicData.songid && musicData.albummid){
-        //   result.push(CreatSong(musicData))
-        // }
       })
       return result
     }

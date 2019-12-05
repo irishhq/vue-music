@@ -5,9 +5,10 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <!-- <div class="filter" ref="filter"></div> -->
+      <div class="filter" ref="filter"></div>
     </div>
-    <scroll :data="songs" class="list" ref="list">
+    <div class="bg-layer" ref="layer"></div>
+    <scroll :data="songs" class="list" ref="list" @scroll="_scroll" :listenScroll="listenSroll" :probeType="probeType">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
@@ -34,14 +35,31 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      listenSroll: true,
+      probeType: 3,
+      scrollY: -1
+    }
+  },
   computed: {
     bgStyle() {
       return `background-image:url(${this.bgImage})`
     }
   },
+  watch: {
+    scrollY(newVal) {
+      this.$refs.layer.style['transform'] = `transform3d(0, ${newVal}px, 0)`
+    }
+  },
   mounted() {
     this.imageHeight = this.$refs.bgImage.clientHeight
     this.$refs.list.$el.style.top = `${this.imageHeight}px`
+  },
+  methods: {
+    _scroll(pos) {
+      this.scrollY = pos.y
+    }
   },
   components: {
     Scroll,
