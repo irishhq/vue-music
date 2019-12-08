@@ -1,8 +1,6 @@
 <template>
   <transition name="slide">
-    <div class="singer-detail">
-      歌手详情...
-    </div>
+    <music-list :title="title" :songs="songs" :bg-image="bgImage"></music-list>
   </transition>
 </template>
 
@@ -12,26 +10,44 @@ import { getSingerDetail } from 'api/singer'
 import { ERROR_OK } from 'api/config'
 import { createSong } from 'common/js/song'
 import { getSongVkey } from 'api/song'
+import MusicList from 'components/music-list/music-list'
+
 export default {
+  components: {
+    MusicList
+  },
   computed: {
+    title() {
+      return this.singer.name
+    },
+    bgImage() {
+      return this.singer.avator
+    },
     ...mapGetters([
       'singer'
     ])
+  },
+  data() {
+    return {
+      songs: []
+    }
   },
   created() {
     this._getDetail()
   },
   methods: {
     _getDetail() {
+      if (!this.singer.id) {
+        this.$router.push('/singer')
+      }
       getSingerDetail(this.singer.id).then(res => {
-        console.log(res)
-        this._formatSongs(res.data.list)
+        console.log(this.singer)
+        this.songs = this._formatSongs(res.data.list)
       })
     },
     _formatSongs(list) {
       let result = []
       list.forEach((item) => {
-        // console.log('item',item)
         // 解构赋值-拿到item 下的 musicData 列表数据
         let {musicData} = item
         // 更新-加上vkey
@@ -42,9 +58,6 @@ export default {
           }
         })
         console.log('musicData', musicData)
-        // if(musicData.songid && musicData.albummid){
-        //   result.push(CreatSong(musicData))
-        // }
       })
       return result
     }
