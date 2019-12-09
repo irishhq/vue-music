@@ -1,6 +1,6 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="back">
       <i class="icon-back"></i>
     </div>
     <h1 class="title" v-html="title"></h1>
@@ -53,6 +53,32 @@ export default {
       let translateY = Math.max(this.minTranslateY, newVal)
       this.$refs.layer.style['transform'] = `translate3d(0, ${translateY}px, 0)`
       console.log(this.minTranslateY, newVal, this.$refs.layer.style['transform'])
+
+      let scale = 1
+      /* 处理滑动到顶部标题遮挡 */
+      let zindex = 0
+      if (-newVal > -this.minTranslateY) {
+        zindex = 10
+        this.$refs.bgImage.style.paddingTop = 0
+        this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+      } else {
+        zindex = 0
+        this.$refs.bgImage.style.paddingTop = `70%`
+        this.$refs.bgImage.style.height = 0
+      }
+
+      /* 下拉图片缩放动态 */
+      const percent = Math.abs(newVal / this.imageHeight)
+      let blur = 0
+      if (newVal > 0) {
+        scale = 1 + percent
+        zindex = 10
+      } else {
+        blur = Math.min(20, percent * 20)
+      }
+      this.$refs.bgImage.style.zIndex = zindex
+      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)` /* 添加上拉模糊效果 */
+      this.$refs.bgImage.style.transform = `scale(${scale})`
     }
   },
   mounted() {
@@ -63,6 +89,9 @@ export default {
   methods: {
     _scroll(pos) {
       this.scrollY = pos.y
+    },
+    back() {
+      this.$router.back()
     }
   },
   components: {
