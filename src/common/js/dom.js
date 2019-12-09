@@ -23,3 +23,36 @@ export function getDataAttr(el, attr, value) {
     return el.target.getAttribute(prefix + attr);
   }
 }
+
+const style = document.createElement('div').style
+
+let vendor = (() => {
+  let transformNames = {
+    webkit: 'webkitTransform',
+    moz: 'mozTransform',
+    ms: 'msTransform',
+    o: 'oTransform',
+    default: 'transform'
+  }
+
+  for (let key in transformNames) {
+    if (style[transformNames[key]] !== undefined) {
+      console.log('================================')
+      console.log(transformNames, style, key, transformNames[key])
+      console.log('================================')
+      return key
+    }
+  }
+
+  return false /* 找不到支持厂商 */
+})()
+
+export function prefixStyle(style) {
+  if (vendor === false) {
+    return false
+  }
+  if (vendor === 'default') {
+    return style
+  }
+  return vendor + style.charAt(0).toUpperCase() + style.substr(1)
+}

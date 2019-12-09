@@ -18,7 +18,9 @@
 <script>
 import Scroll from 'base/scroll/scroll'
 import SongList from 'base/song-list/song-list'
+import { prefixStyle } from 'common/js/dom'
 const RESERVED_HEIGHT = 40
+const transform = prefixStyle('transform')
 export default {
   props: {
     bgImage: {
@@ -51,8 +53,8 @@ export default {
   watch: {
     scrollY(newVal) {
       let translateY = Math.max(this.minTranslateY, newVal)
-      this.$refs.layer.style['transform'] = `translate3d(0, ${translateY}px, 0)`
-      console.log(this.minTranslateY, newVal, this.$refs.layer.style['transform'])
+      this.$refs.layer.style[transform] = `translate3d(0, ${translateY}px, 0)`
+      console.log(this.minTranslateY, newVal, this.$refs.layer.style[transform])
 
       let scale = 1
       /* 处理滑动到顶部标题遮挡 */
@@ -78,7 +80,7 @@ export default {
       }
       this.$refs.bgImage.style.zIndex = zindex
       this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)` /* 添加上拉模糊效果 */
-      this.$refs.bgImage.style.transform = `scale(${scale})`
+      this.$refs.bgImage.style[transform] = `scale(${scale})`
     }
   },
   mounted() {
