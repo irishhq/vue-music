@@ -54,7 +54,6 @@ export default {
     scrollY(newVal) {
       let translateY = Math.max(this.minTranslateY, newVal)
       this.$refs.layer.style[transform] = `translate3d(0, ${translateY}px, 0)`
-      console.log(this.minTranslateY, newVal, this.$refs.layer.style[transform])
 
       let scale = 1
       /* 处理滑动到顶部标题遮挡 */

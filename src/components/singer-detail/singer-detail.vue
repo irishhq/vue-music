@@ -41,7 +41,6 @@ export default {
         this.$router.push('/singer')
       }
       getSingerDetail(this.singer.id).then(res => {
-        console.log(this.singer)
         this.songs = this._formatSongs(res.data.list)
       })
     },
@@ -57,7 +56,6 @@ export default {
             result.push(createSong(musicData, vkey))
           }
         })
-        console.log('musicData', musicData)
       })
       return result
     }

@@ -37,9 +37,6 @@ let vendor = (() => {
 
   for (let key in transformNames) {
     if (style[transformNames[key]] !== undefined) {
-      console.log('================================')
-      console.log(transformNames, style, key, transformNames[key])
-      console.log('================================')
       return key
     }
   }
