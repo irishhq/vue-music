@@ -5,6 +5,12 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div class="play" v-show="songs.length>0" ref="playBtn">
+          <i class="icon-play"></i>
+          <span class="text">随机播放歌曲</span>
+        </div>
+      </div>
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -12,12 +18,16 @@
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
+      <div class="loading-content" v-show="!songs.length">
+        <loading></loading>
+      </div>
     </scroll>
   </div>
 </template>
 <script>
 import Scroll from 'base/scroll/scroll'
 import SongList from 'base/song-list/song-list'
+import Loading from 'base/loading/loading'
 import { prefixStyle } from 'common/js/dom'
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -62,10 +72,12 @@ export default {
         zindex = 10
         this.$refs.bgImage.style.paddingTop = 0
         this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+        this.$refs.playBtn.style.display = 'none'
       } else {
         zindex = 0
         this.$refs.bgImage.style.paddingTop = `70%`
         this.$refs.bgImage.style.height = 0
+        this.$refs.playBtn.style.display = ''
       }
 
       /* 下拉图片缩放动态 */
@@ -78,7 +90,7 @@ export default {
         blur = Math.min(20, percent * 20)
       }
       this.$refs.bgImage.style.zIndex = zindex
-      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)` /* 添加上拉模糊效果 */
+      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)` /* 添加上拉模糊效果, backdrop-fliter前缀-设备 */
       this.$refs.bgImage.style[transform] = `scale(${scale})`
     }
   },
@@ -97,7 +109,8 @@ export default {
   },
   components: {
     Scroll,
-    SongList
+    SongList,
+    Loading
   }
 }
 </script>
