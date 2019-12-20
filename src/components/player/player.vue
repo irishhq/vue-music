@@ -2,7 +2,7 @@
   <div class="player" v-show="playList.length>0">
     <div class="normal-player" v-show="fullScreen">
       <div class="background">
-        <img :src="currentSong.image" alt="">
+        <img :src="currentSong.image" alt="" width="100%" height="100%">
       </div>
       <div class="top">
         <div class="back" @click="minimizePlayer">
@@ -42,7 +42,7 @@
     </div>
     <div class="mini-player" v-show="!fullScreen" @click="maximizePlayer">
       <div class="icon">
-        <img :src="currentSong.image" alt="">
+        <img :src="currentSong.image" alt="" width="40" height="40">
       </div>
       <div class="text">
         <h2 class="name" v-html="currentSong.name"></h2>
