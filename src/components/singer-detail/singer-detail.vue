@@ -42,6 +42,7 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         this.songs = this._formatSongs(res.data.list)
+        console.log('singer-detail.vue--this.songs ', this.songs)
       })
     },
     _formatSongs(list) {

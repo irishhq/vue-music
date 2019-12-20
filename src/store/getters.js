@@ -5,7 +5,7 @@ export const playing = state => state.playing
 
 export const fullScreen = state => state.fullScreen
 
-export const playList = state => state.playing
+export const playList = state => state.playList
 
 export const sequence = state => state.sequence
 

@@ -108,7 +108,7 @@ export default {
       this.$router.back()
     },
     selectSong(item, index) {
-      /* 不要依赖外部组件如何使用，而去定义子组件的行为，子组件应传送点击的item和位置index */
+      /* 不要依赖外部组件如何使用，而去定义子组件的行为，子组件的行为应与子组件本身相关，所以应传送点击的item和位置index */
       this.selectPlay({
         list: this.songs,
         index: index
