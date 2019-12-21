@@ -7,7 +7,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
-import { ERROR_OK } from 'api/config'
+import { ERR_OK } from 'api/config'
 import { createSong } from 'common/js/song'
 import { getSongVkey } from 'api/song'
 import MusicList from 'components/music-list/music-list'
@@ -41,22 +41,24 @@ export default {
         this.$router.push('/singer')
       }
       getSingerDetail(this.singer.id).then(res => {
-        this.songs = this._formatSongs(res.data.list)
-        console.log('singer-detail.vue--this.songs ', this.songs)
+        if (res.status === ERR_OK) {
+          this.songs = this._formatSongs(res.data.hotSongs)
+        }
       })
     },
     _formatSongs(list) {
       let result = []
       list.forEach((item) => {
         // 解构赋值-拿到item 下的 musicData 列表数据
-        let {musicData} = item
+        let {...musicData} = item
         // 更新-加上vkey
-        getSongVkey(musicData.songmid).then(res => {
-          const vkey = res.data.items[0].vkey;
-          if (musicData.songid && musicData.albummid) {
-            result.push(createSong(musicData, vkey))
-          }
-        })
+        // getSongVkey(musicData.songmid).then(res => {
+        //   const vkey = res.data.items[0].vkey;
+        //   if (musicData.songid && musicData.albummid) {
+        //     result.push(createSong(musicData, vkey))
+        //   }
+        // })
+        result.push(createSong(musicData))
       })
       return result
     }

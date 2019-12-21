@@ -15,7 +15,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdClass">
                 <img class="image" :src="currentSong.image" alt="">
               </div>
             </div>
@@ -30,7 +30,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i :class="playIcon" @click="togglePlaying"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -45,18 +45,21 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="maximizePlayer">
         <div class="icon">
-          <img :src="currentSong.image" alt="" width="40" height="40">
+          <img :class="cdClass" :src="currentSong.image" alt="" width="40" height="40">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <i :class="miniIcon" @click.stop="togglePlaying"></i>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <audio :src="songUrl" ref="audio"></audio>
   </div>
 </template>
 
@@ -64,14 +67,52 @@
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
+import { getSong } from 'api/song'
 const transform = prefixStyle('transform')
 export default {
+  data() {
+    return {
+      songUrl: '' /* 歌曲地址 */
+    }
+  },
   computed: {
     ...mapGetters([
       'fullScreen',
       'playList',
-      'currentSong'
-    ])
+      'currentSong',
+      'playing'
+    ]),
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    miniIcon() {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    cdClass() {
+      return this.playing ? 'play' : 'play pause'
+    }
+  },
+  watch: {
+    currentSong(newVal, oldVal) {
+      if (!newVal.id) {
+        return
+      }
+      if (newVal.id === oldVal.id) {
+        return
+      }
+      this._getSong(newVal.id)
+    },
+    songUrl(newVal) {
+      this.$nextTick(() => {
+        this.$refs.audio.play()
+      })
+    },
+    playing(newPlaying) {
+      const audio = this.$refs.audio
+      this.$nextTick(() => {
+        newPlaying ? audio.play() : audio.pause()
+      })
+    }
   },
   methods: {
     minimizePlayer() {
@@ -80,9 +121,6 @@ export default {
     maximizePlayer() {
       this.setFullScreen(true)
     },
-    ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
-    }),
     enter(el, done) {
       let {x, y, scale} = this._getPosAndScale()
       let animation = {
@@ -123,6 +161,10 @@ export default {
       this.$refs.cdWrapper.style.transition = ''
       this.$refs.cdWrapper.style[transform] = ''
     },
+    /* 暂停&播放 */
+    togglePlaying() {
+      this.setPlayingState(!this.playing)
+    },
     _getPosAndScale() {
       /* 以中心点为基准 */
       const targetWidth = 40
@@ -133,9 +175,18 @@ export default {
       const scale = targetWidth / cdWidth
       const x = -(window.innerWidth / 2 - paddingLeft - targetWidth / 2)
       const y = window.innerHeight - paddingTop - (cdWidth / 2) - paddingBottom
-      console.log(x, y, scale)
       return {x, y, scale}
-    }
+    },
+    /* 获取歌曲播放地址 */
+    _getSong(id) {
+      getSong(id).then((res) => {
+        this.songUrl = res.data.data[0].url
+      })
+    },
+    ...mapMutations({
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE'
+    })
   }
 }
 </script>
@@ -221,7 +272,7 @@ export default {
               &.play
                 animation: rotate 20s linear infinite
               &.pause
-                animation-play-state: paused
+                animation-play-state: paused  /* 暂停动画 */
               .image
                 position: absolute
                 left: 0

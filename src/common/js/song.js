@@ -11,7 +11,7 @@ export default class Song {
   }
 }
 
-export function createSong(musicData, vkey) {
+/* export function createSong(musicData, vkey) {
   return new Song({
     id: musicData.songid,
     mid: musicData.songmid,
@@ -22,6 +22,17 @@ export function createSong(musicData, vkey) {
     url: `http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?fromtag=38&guid=5931742855&vkey=${vkey}`,
     duration: musicData.interval
   });
+} */
+
+export function createSong (music) {
+  return new Song({
+    id: music.id,
+    singer: singerName(music.ar),
+    name: music.name,
+    // aliaName: filiterAliaName(music.alia),
+    album: music.al.name,
+    image: music.al.picUrl
+  })
 }
 
 function filterSinger(singer) {
@@ -33,4 +44,14 @@ function filterSinger(singer) {
     ret.push(s.name);
   });
   return ret.join('/');
+}
+
+function singerName (arr) {
+  let name = []
+  name = arr.map((item) => {
+    // console.log(arr)
+    return item.name
+  })
+
+  return name.join('/')
 }

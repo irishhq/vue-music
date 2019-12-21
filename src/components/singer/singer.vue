@@ -6,10 +6,11 @@
 </template>
 <script>
 import { getSingerList } from 'api/singer'
-import { ERROR_OK } from 'api/config'
+import { ERR_OK } from 'api/config'
 import Listview from 'base/listview/listview'
 import Singer from 'common/js/singer'
 import { mapMutations } from 'vuex'
+const pinyin = require('pinyin')
 const HOT_TITLE = '热门'
 const HOT_LEN = 10
 export default {
@@ -33,8 +34,15 @@ export default {
     },
     _getSingerList() {
       getSingerList().then((res) => {
-        if (res.code === ERROR_OK) {
-          this.singers = this.normalizeSingers(res.data.list || [])
+        if (res.status === ERR_OK) {
+          let list = res.data.artists
+          list.map(item => {
+            let firstLetterArr = pinyin(item.name[0], {
+              style: pinyin.STYLE_FIRST_LETTER
+            })
+            item.firstLetter = firstLetterArr[0][0].toUpperCase()
+          })
+          this.singers = this.normalizeSingers(list || [])
         }
       })
     },
@@ -51,9 +59,9 @@ export default {
       }
       list.forEach((item, index) => {
         if (index < HOT_LEN) {
-          map.hot.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
+          map.hot.items.push(new Singer(item.id, item.name, item.img1v1Url, item.alias.join(' / ')))
         }
-        let key = item.Findex
+        let key = item.firstLetter
         if (key.match(/[a-zA-Z]/)) {
           if (!map[key]) {
             map[key] = {
@@ -61,9 +69,9 @@ export default {
               items: []
             }
           }
-          map[key].items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
+          map[key].items.push(new Singer(item.id, item.name, item.img1v1Url, item.alias[0]))
         } else {
-          map.other.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name, item.Fsinger_mid))
+          map.other.items.push(new Singer(item.id, item.name, item.img1v1Url, item.alias[0]))
         }
       })
       /* 数据排序,展示有序列表 */

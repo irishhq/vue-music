@@ -11,3 +11,6 @@ export const options = {
 };
 
 export const ERROR_OK = 0;
+export const ERR_OK = 200
+
+export const HOST = 'http://localhost:3000'
