@@ -1,63 +1,70 @@
 <template>
   <div class="player" v-show="playList.length>0">
-    <div class="normal-player" v-show="fullScreen">
-      <div class="background">
-        <img :src="currentSong.image" alt="" width="100%" height="100%">
-      </div>
-      <div class="top">
-        <div class="back" @click="minimizePlayer">
-          <i class="icon-back"></i>
+    <transition name="normal" @enter="enter" @after-enter="afterEnter" @leave="leave" @afterLeave="afterLeave">
+      <div class="normal-player" v-show="fullScreen">
+        <div class="background">
+          <img :src="currentSong.image" alt="" width="100%" height="100%">
         </div>
-        <h1 class="title" v-html="currentSong.name"></h1>
-        <h2 class="subtitle" v-html="currentSong.singer"></h2>
-      </div>
-      <div class="middle">
-        <div class="middle-l">
-          <div class="cd-wrapper">
-            <div class="cd">
-              <img class="image" :src="currentSong.image" alt="">
+        <div class="top">
+          <div class="back" @click="minimizePlayer">
+            <i class="icon-back"></i>
+          </div>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
+        </div>
+        <div class="middle">
+          <div class="middle-l">
+            <div class="cd-wrapper" ref="cdWrapper">
+              <div class="cd">
+                <img class="image" :src="currentSong.image" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="operators">
+            <div class="icon i-left">
+              <i class="icon-sequence"></i>
+            </div>
+            <div class="icon i-left">
+              <i class="icon-prev"></i>
+            </div>
+            <div class="icon i-center">
+              <i class="icon-play"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon-next"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon-not-favorite"></i>
             </div>
           </div>
         </div>
       </div>
-      <div class="bottom">
-        <div class="operators">
-          <div class="icon i-left">
-            <i class="icon-sequence"></i>
-          </div>
-          <div class="icon i-left">
-            <i class="icon-prev"></i>
-          </div>
-          <div class="icon i-center">
-            <i class="icon-play"></i>
-          </div>
-          <div class="icon i-right">
-            <i class="icon-next"></i>
-          </div>
-          <div class="icon i-right">
-            <i class="icon-not-favorite"></i>
-          </div>
+    </transition>
+    <transition name="mini">
+      <div class="mini-player" v-show="!fullScreen" @click="maximizePlayer">
+        <div class="icon">
+          <img :src="currentSong.image" alt="" width="40" height="40">
+        </div>
+        <div class="text">
+          <h2 class="name" v-html="currentSong.name"></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
+        </div>
+        <div class="control"></div>
+        <div class="control">
+          <i class="icon-playlist"></i>
         </div>
       </div>
-    </div>
-    <div class="mini-player" v-show="!fullScreen" @click="maximizePlayer">
-      <div class="icon">
-        <img :src="currentSong.image" alt="" width="40" height="40">
-      </div>
-      <div class="text">
-        <h2 class="name" v-html="currentSong.name"></h2>
-        <p class="desc" v-html="currentSong.singer"></p>
-      </div>
-      <div class="control"></div>
-      <div class="control">
-        <i class="icon-playlist"></i>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import animations from 'create-keyframe-animation'
+import {prefixStyle} from 'common/js/dom'
+const transform = prefixStyle('transform')
 export default {
   computed: {
     ...mapGetters([
@@ -75,7 +82,60 @@ export default {
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN'
-    })
+    }),
+    enter(el, done) {
+      let {x, y, scale} = this._getPosAndScale()
+      let animation = {
+        0: {
+          transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})` /* 小CD图标位置 */
+        },
+        60: {
+          transform: `translate3d(0, 0, 0) scale(1.1)`
+        },
+        100: {
+          transform: `translate3d(0, 0, 0) scale(1)`
+        }
+      }
+
+      animations.registerAnimation({
+        name: 'moveCD',
+        animation,
+        presets: {
+          duration: 600,
+          easing: 'ease'
+        }
+      })
+
+      animations.runAnimation(this.$refs.cdWrapper, 'moveCD', done)
+    },
+    afterEnter() {
+      animations.unregisterAnimation('moveCD')
+      this.$refs.cdWrapper.style.animation = ''
+    },
+    leave(el, done) {
+      this.$refs.cdWrapper.style.transition = 'all 0.4s'
+      const {x, y, scale} = this._getPosAndScale()
+      this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
+      this.$refs.cdWrapper.addEventListener('transitionend', done)
+    },
+    afterLeave() {
+      /* 清空动效，再次打开位置无误 */
+      this.$refs.cdWrapper.style.transition = ''
+      this.$refs.cdWrapper.style[transform] = ''
+    },
+    _getPosAndScale() {
+      /* 以中心点为基准 */
+      const targetWidth = 40
+      const paddingLeft = 20 /* mini-player */
+      const paddingTop = 80 /* normal-play */
+      const paddingBottom = 10
+      const cdWidth = window.innerWidth * 0.8
+      const scale = targetWidth / cdWidth
+      const x = -(window.innerWidth / 2 - paddingLeft - targetWidth / 2)
+      const y = window.innerHeight - paddingTop - (cdWidth / 2) - paddingBottom
+      console.log(x, y, scale)
+      return {x, y, scale}
+    }
   }
 }
 </script>
@@ -256,15 +316,16 @@ export default {
           .icon-favorite
             color: $color-sub-theme
       &.normal-enter-active, &.normal-leave-active
-        transition: all 0.4s
+        transition: all .4s
         .top, .bottom
-          transition: all 0.4s cubic-bezier(0.86, 0.18, 0.82, 1.32)
+          transition: all .4s cubic-bezier(0.86, 0.18, 0.82, 1.32)
       &.normal-enter, &.normal-leave-to
         opacity: 0
+        transform: translate3d(0, -100px, 0)
         .top
-          transform: translate3d(0, -100px, 0)
+          // transform: translate3d(0, -100px, 0)
         .bottom
-          transform: translate3d(0, 100px, 0)
+          // transform: translate3d(0, 100px, 0)
     .mini-player
       display: flex
       align-items: center
@@ -279,6 +340,7 @@ export default {
         transition: all 0.4s
       &.mini-enter, &.mini-leave-to
         opacity: 0
+        transform: translate3d(0, 100px, 0)
       .icon
         flex: 0 0 40px
         width: 40px
