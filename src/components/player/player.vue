@@ -22,6 +22,14 @@
           </div>
         </div>
         <div class="bottom">
+          <!-- 播放进度条 -->
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChanged="onProgressBarChanged"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -59,7 +67,7 @@
         </div>
       </div>
     </transition>
-    <audio :src="songUrl" ref="audio" @canplay="ready" @error="error"></audio>
+    <audio :src="songUrl" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -68,12 +76,16 @@ import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
 import { getSong } from 'api/song'
+import ProgressBar from 'base/progress-bar/progress-bar'
 const transform = prefixStyle('transform')
 export default {
   data() {
     return {
       songUrl: '', /* 歌曲地址 */
-      songReady: false
+      songReady: false,
+      currentTime: 0,
+      duration: 0,
+      percent: 0
     }
   },
   computed: {
@@ -108,6 +120,14 @@ export default {
       this._getSong(newVal.id)
     },
     songUrl(newVal) {
+      /* 获取音乐总时长 */
+      let stop = setInterval(() => {
+        /* 手动不断读取audio的时长 */
+        this.duration = this.$refs.audio.duration
+        if (this.duration) {
+          clearInterval(stop)
+        }
+      }, 150)
       this.$nextTick(() => {
         this.$refs.audio.play()
       })
@@ -121,6 +141,10 @@ export default {
       let timer = setTimeout(() => {
         newPlaying ? audio.play() : audio.pause()
       }, 1000)
+    },
+    currentTime(newVal) {
+      /* 监测当前播放时间，以改变进度条变量percent */
+      this.percent = newVal / this.duration
     }
   },
   methods: {
@@ -213,6 +237,35 @@ export default {
     error() { /* error 事件在音频/视频(audio/video)加载发生错误时触发,songReady仅控制连点操作 */
       this.songReady = true
     },
+    updateTime(e) {
+      this.currentTime = e.target.currentTime /*  需格式化时间戳 */
+    },
+    /* 拖拽后更新播放进度条 */
+    onProgressBarChanged(percent) {
+      this.$refs.audio.currentTime = this.duration * percent
+      if (!this.playing) {
+        this.setPlayingState(true)
+      }
+    },
+    /**
+     * @description 时间格式化
+     * @param interval 时间戳
+     */
+    format(interval) {
+      interval = interval | 0 /* 向下取整 */
+      const minute = this._pad(interval / 60 | 0)
+      const second = this._pad(interval % 60)
+      return `${minute}:${second}`
+    },
+    /* 时间补零 */
+    _pad(num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
+    },
     _getPosAndScale() {
       /* 以中心点为基准 */
       const targetWidth = 40
@@ -236,6 +289,9 @@ export default {
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX'
     })
+  },
+  components: {
+    ProgressBar
   }
 }
 </script>
