@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressBarClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
       <div class="progress-btn-wrapper" ref="progressBtn"
@@ -52,6 +52,10 @@ export default {
     progressTouchEnd(e) {
       this.touch.initialled = false
       this._triggerPercent() /* 向父组件传递移动后的百分比值 */
+    },
+    progressBarClick(e) {
+      this._offset(e.offsetX)
+      this._triggerPercent()
     },
     _offset(offsetWidth) {
       this.$refs.progress.style.width = `${offsetWidth}px`
