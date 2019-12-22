@@ -111,9 +111,12 @@ export default {
     },
     playing(newPlaying) { /* 播放状态 */
       const audio = this.$refs.audio
-      this.$nextTick(() => {
+      // this.$nextTick(() => {
+      //   newPlaying ? audio.play() : audio.pause()
+      // })
+      let timer = setTimeout(() => {  
         newPlaying ? audio.play() : audio.pause()
-      })
+      }, 1000)  //定时未清除
     }
   },
   methods: {
