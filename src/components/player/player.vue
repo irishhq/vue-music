@@ -26,13 +26,13 @@
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left" :class="disableClass">
               <i class="icon-prev" @click="prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableClass">
               <i :class="playIcon" @click="togglePlaying"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableClass">
               <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
@@ -59,7 +59,7 @@
         </div>
       </div>
     </transition>
-    <audio :src="songUrl" ref="audio" @canplay="ready"></audio>
+    <audio :src="songUrl" ref="audio" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -92,6 +92,9 @@ export default {
     },
     cdClass() {
       return this.playing ? 'play' : 'play pause'
+    },
+    disableClass() {
+      return this.songReady ? '' : 'disable'
     }
   },
   watch: {
@@ -114,9 +117,10 @@ export default {
       // this.$nextTick(() => {
       //   newPlaying ? audio.play() : audio.pause()
       // })
-      let timer = setTimeout(() => {  
+      // 定时未清除
+      let timer = setTimeout(() => {
         newPlaying ? audio.play() : audio.pause()
-      }, 1000)  //定时未清除
+      }, 1000)
     }
   },
   methods: {
@@ -204,6 +208,9 @@ export default {
     },
     /* 歌曲是否为可播放状态 */
     ready() {
+      this.songReady = true
+    },
+    error() { /* error 事件在音频/视频(audio/video)加载发生错误时触发,songReady仅控制连点操作 */
       this.songReady = true
     },
     _getPosAndScale() {
