@@ -92,7 +92,9 @@ export default {
         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
       })
       letter.unshift.apply(letter, hot) /* concat内存开销大;大数组合并小数组，减少数组元素操作次数 */
-      letter.push.apply(letter, other)
+      if (other[0].length > 0) {
+        letter.push.apply(letter, other)
+      }
       return letter
     },
     /* 工具函数会将store中的state映射到局部计算属性中 */

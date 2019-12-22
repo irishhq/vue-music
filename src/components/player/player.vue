@@ -27,13 +27,13 @@
               <i class="icon-sequence"></i>
             </div>
             <div class="icon i-left">
-              <i class="icon-prev"></i>
+              <i class="icon-prev" @click="prev"></i>
             </div>
             <div class="icon i-center">
               <i :class="playIcon" @click="togglePlaying"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon-next"></i>
+              <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-not-favorite"></i>
@@ -59,7 +59,7 @@
         </div>
       </div>
     </transition>
-    <audio :src="songUrl" ref="audio"></audio>
+    <audio :src="songUrl" ref="audio" @canplay="ready"></audio>
   </div>
 </template>
 
@@ -72,7 +72,8 @@ const transform = prefixStyle('transform')
 export default {
   data() {
     return {
-      songUrl: '' /* 歌曲地址 */
+      songUrl: '', /* 歌曲地址 */
+      songReady: false
     }
   },
   computed: {
@@ -80,7 +81,8 @@ export default {
       'fullScreen',
       'playList',
       'currentSong',
-      'playing'
+      'playing',
+      'currentIndex'
     ]),
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -107,7 +109,7 @@ export default {
         this.$refs.audio.play()
       })
     },
-    playing(newPlaying) {
+    playing(newPlaying) { /* 播放状态 */
       const audio = this.$refs.audio
       this.$nextTick(() => {
         newPlaying ? audio.play() : audio.pause()
@@ -115,12 +117,14 @@ export default {
     }
   },
   methods: {
+    /* 最大最小化播放器 */
     minimizePlayer() {
       this.setFullScreen(false)
     },
     maximizePlayer() {
       this.setFullScreen(true)
     },
+    /* 动画效果实现 */
     enter(el, done) {
       let {x, y, scale} = this._getPosAndScale()
       let animation = {
@@ -165,6 +169,40 @@ export default {
     togglePlaying() {
       this.setPlayingState(!this.playing)
     },
+    /* 播放前一首 */
+    prev() {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex - 1
+      if (index < 0) {
+        index = this.playList.length - 1
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying(true)
+      }
+      this.songReady = false
+    },
+    /* 播放下一首 */
+    next() {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex + 1
+      if (index === this.playList.length) {
+        index = 0
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying(true)
+      }
+      this.songReady = false
+    },
+    /* 歌曲是否为可播放状态 */
+    ready() {
+      this.songReady = true
+    },
     _getPosAndScale() {
       /* 以中心点为基准 */
       const targetWidth = 40
@@ -185,7 +223,8 @@ export default {
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      setPlayingState: 'SET_PLAYING_STATE'
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     })
   }
 }
