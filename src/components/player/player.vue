@@ -60,7 +60,9 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i :class="miniIcon" @click.stop="togglePlaying"></i>
+          <Progress-Circle :radius="radius">
+            <i :class="miniIcon" @click.stop="togglePlaying"></i>
+          </Progress-Circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -77,6 +79,11 @@ import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
 import { getSong } from 'api/song'
 import ProgressBar from 'base/progress-bar/progress-bar'
+import ProgressCircle from 'base/progress-circle/progress-circle'
+
+import { getSingerList } from 'api/singer'
+import { ERR_OK } from 'api/config'
+
 const transform = prefixStyle('transform')
 export default {
   data() {
@@ -85,7 +92,8 @@ export default {
       songReady: false,
       currentTime: 0,
       duration: 0,
-      percent: 0
+      percent: 0,
+      radius: 32 /*  */
     }
   },
   computed: {
@@ -148,6 +156,16 @@ export default {
     }
   },
   methods: {
+    jump() {
+      /* 测试chrome preserveLog */
+      getSingerList().then((res) => {
+        if (res.status === ERR_OK) {
+          alert('hello')
+          window.onunload = function() { debugger; }
+          window.location.href = 'https://www.baidu.com/'
+        }
+      })
+    },
     /* 最大最小化播放器 */
     minimizePlayer() {
       this.setFullScreen(false)
@@ -291,7 +309,8 @@ export default {
     })
   },
   components: {
-    ProgressBar
+    ProgressBar,
+    ProgressCircle
   }
 }
 </script>
