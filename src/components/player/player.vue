@@ -32,7 +32,7 @@
           </div>
           <div class="operators">
             <div class="icon i-left">
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="changeMode"></i>
             </div>
             <div class="icon i-left" :class="disableClass">
               <i class="icon-prev" @click="prev"></i>
@@ -83,6 +83,8 @@ import ProgressCircle from 'base/progress-circle/progress-circle'
 
 import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
+import { playMode } from 'common/js/config'
+import { shuffle } from 'common/js/utils'
 
 const transform = prefixStyle('transform')
 export default {
@@ -102,7 +104,9 @@ export default {
       'playList',
       'currentSong',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode',
+      'sequenceList'
     ]),
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -115,6 +119,9 @@ export default {
     },
     disableClass() {
       return this.songReady ? '' : 'disable'
+    },
+    iconMode() {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
     }
   },
   watch: {
@@ -165,6 +172,26 @@ export default {
           window.location.href = 'https://www.baidu.com/'
         }
       })
+    },
+    /* 切换播放模式：随机，顺序，循环 */
+    changeMode() {
+      let mode = (this.mode + 1) % 3
+      this.setMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this._resetCurrentIndex(list) /* 切换模式时保证歌曲不变 */
+      this.setPlayList(list)
+    },
+    /* 重置当前播放歌曲在新的list中的index值 */
+    _resetCurrentIndex (list) {
+      let index = list.findIndex((item) => { /* findIndex()方法返回数组中满足提供的测试函数的第一个元素的索引 */
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
     },
     /* 最大最小化播放器 */
     minimizePlayer() {
@@ -305,7 +332,9 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setMode: 'SET_MODE',
+      setPlayList: 'SET_PLAY_LIST'
     })
   },
   components: {
